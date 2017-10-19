@@ -44,10 +44,28 @@ define(['dojo/_base/declare',
         //Accepts data from a layers fieldInfos, the locators field definitions
         if (this.type === 'fieldInfos') {
           this.popupTitle = this.nls.configureFields;
+          if (this._layerInfo.featureLayer && this._layerInfo.featureLayer.fields) {
+            this._updateFieldTypes(this._layerInfo.fieldInfos, this._layerInfo.featureLayer.fields);
+          }
           this._setFieldsTable(this._layerInfo.fieldInfos);
         } else {
           this._setAddressFieldsTable(this.addressFields);
         }
+      },
+
+      _updateFieldTypes: function (fieldInfos, fields) {
+        array.forEach(fieldInfos, function (fieldInfo) {
+          if (typeof (fieldInfo.type) === 'undefined') {
+            layer_field_loop:
+            for (var i = 0; i < fields.length; i++) {
+              var field = fields[i];
+              if (field.name === fieldInfo.fieldName) {
+                fieldInfo.type = field.type;
+                break layer_field_loop;
+              }
+            }
+          }
+        });
       },
 
       popupEditPage: function () {
